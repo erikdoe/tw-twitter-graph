@@ -5,13 +5,14 @@ idx = 0
 twers = {}
 File.open("twitternames.txt", "r").each_line do |line|
   unless line.start_with?("#") or line.strip == "" then
-    twers[line.strip] = { :id => idx }
+    twers[line.strip] = { :id => idx, :fcount => 0 }
     idx += 1
   end
 end
 
 followers = {}
 twers.each_key do |username|
+  next unless File.exists?("followers-#{username}.json")
   response = JSON.parse(File.read("followers-#{username}.json"))
   twers[username].merge!({ :fcount => response["ids"].length })
   response["ids"].each do |followerid|
