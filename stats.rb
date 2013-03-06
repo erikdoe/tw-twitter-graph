@@ -9,6 +9,7 @@ end
 
 followers = {}
 twers.each do |username|
+  next unless File.exists?("followers-#{username}.json")
   response = JSON.parse(File.read("followers-#{username}.json"))
   response["ids"].each do |followerid|
     followers[followerid] = (followers[followerid] || 0) + 1
@@ -34,5 +35,5 @@ puts "The number of people who follow one or more ThoughtWorkers.\n\n"
 puts "Connectedness:"
 puts "The number of people who follow *x* ThoughtWorkers."
 buckets.each_with_index do |v, i|
-  puts "  #{i}: #{v}" unless i == 0
+  puts "  #{v} => #{i}" unless v.nil?
 end
