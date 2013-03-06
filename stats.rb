@@ -1,26 +1,15 @@
 require 'json'
 
-twers = []
-File.open("twitternames.txt", "r").each_line do |line|
-  unless line.start_with?("#") or line.strip == "" then
-    twers.push(line.strip)
-  end
-end
+load 'shared.rb'
 
-followers = {}
-twers.each do |username|
-  next unless File.exists?("followers-#{username}.json")
-  response = JSON.parse(File.read("followers-#{username}.json"))
-  response["ids"].each do |followerid|
-    followers[followerid] = (followers[followerid] || 0) + 1
-  end
-end
+twers = create_map(read_names())
+followers = read_followers(twers)
 
 total = 0
 buckets = []
 followers.each_value do |v|
-  total += v
-  buckets[v.to_i] = (buckets[v] || 0) + 1
+  total += v.length
+  buckets[v.length] = (buckets[v.length] || 0) + 1
 end
 
 puts "ThoughtWorkers: #{twers.length}"
