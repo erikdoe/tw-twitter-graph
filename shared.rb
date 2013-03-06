@@ -1,6 +1,6 @@
 
 def read_names()
-  File.open("twitternames.txt", "r")
+  File.open("data/twitternames.txt", "r")
     .readlines
     .reject { |line| line.start_with?("#") or line.strip == "" } 
     .map { |line| line.strip }
@@ -15,7 +15,7 @@ end
 
 def response_filename(username, cursor = "-1")
   suffix = (cursor == "-1") ? "" : "-#{cursor}"
-  "followers-#{username}#{suffix}.json"
+  "data/followers-#{username}#{suffix}.json"
 end
 
 def add_follower_file(username, filename, twers, followers)

@@ -2,6 +2,7 @@ download-auth.yml
 twitternames.txt
 followers-*.json
 twittergraph.gml
+data
 
 *.gem
 *.rbc
