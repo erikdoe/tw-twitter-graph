@@ -20,7 +20,7 @@ end
 
 
 def download_followers(access_token, username, cursor = "-1")
-  filename = response_filename(username, token)
+  filename = response_filename(username, cursor)
   return if File.exists?(filename) # TODO: handle the case where only the first file(s) of a set exist
   response = nil
   loop do
