@@ -4,7 +4,7 @@ load 'shared.rb'
 
 
 def write_graph(twers, followers)
-  puts "Creator \"graph.rb on #{Time.now.to_s}\""
+  puts "Creator \"#{$0}\" on #{Time.now.to_s}\""
   puts "graph"
   puts "["
 
