@@ -27,7 +27,10 @@ def download_followers(access_token, username, cursor = "-1")
     response = access_token.request(:get, "https://api.twitter.com/1.1/followers/ids.json?cursor=#{cursor}&screen_name=#{username}&count=5000")
     puts "#{filename}: #{response.code} (#{response.message})"
     break if response.code == "200"
-    if response.code == "429" then
+    if response.code == "401" || response.code == "404" then
+      puts "skipping"
+      return
+    elsif response.code == "429" then
       print "sleeping for 5 minutes due to rate limit"
       for i in (1..5) do
         sleep 60
