@@ -1,9 +1,9 @@
 
 def read_names()
-  File.open("data/twitternames.txt", "r")
+  File.open("data/input.csv", "r")
     .readlines
     .reject { |line| line.start_with?("#") or line.strip == "" } 
-    .map { |line| line.strip }
+    .map { |line| line.split(/,/)[2].strip.gsub(/@/, "") }
 end
 
 def create_map(names)
