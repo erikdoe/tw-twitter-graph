@@ -29,23 +29,23 @@ def follower_filename(username, cursor = "-1")
   "data/followers-#{username}#{suffix}.json"
 end
 
-def add_follower_file(username, filename, twers, followers)
+def add_follower_file(username, filename, twers, followers, key)
   return unless File.exists?(filename)
   response = JSON.parse(File.read(filename))
   response["ids"].each do |followerid|
     followers[followerid] ||= []
-    followers[followerid].push(twers[username][:idx])
+    followers[followerid].push(twers[username][key])
   end
   next_cursor = response["next_cursor_str"]
   if next_cursor != "0" then
-    add_follower_file(username, follower_filename(username, next_cursor), twers, followers)
+    add_follower_file(username, follower_filename(username, next_cursor), twers, followers, key)
   end
 end
 
-def read_followers(twers)
+def read_followers(twers, key=:idx)
   followers = {}
   twers.each_key do |username|
-    add_follower_file(username, follower_filename(username), twers, followers)
+    add_follower_file(username, follower_filename(username), twers, followers, key)
   end
   followers
 end
