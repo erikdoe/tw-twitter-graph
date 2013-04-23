@@ -1,6 +1,8 @@
 require 'json'
 require 'narray'
+require 'gexf'
 
+load 'gexf_patch.rb'
 load 'shared.rb'
 
 def calc_connections(twers, followers)
@@ -18,24 +20,30 @@ end
 
 
 def write_graph(twers, connections)
-  puts "Creator \"#{$0}\" on #{Time.now.to_s}"
-  puts "graph"
-  puts "["
+  graph = GEXF::Graph.new
+  graph.define_node_attribute(:id)
+  graph.define_node_attribute(:name)
+  graph.define_node_attribute(:followers, :type => GEXF::Attribute::INTEGER)
+  graph.define_node_attribute(:tweets, :type => GEXF::Attribute::INTEGER)
 
-  twers.each { |username, a| puts "  node\n  [\n    id #{a[:id]}\n    label \"#{username}\"\n    size #{a[:fcount]}.0\n  ]" }
+  twers.each do |username, a| 
+    n = graph.create_node(:id => a[:idx].to_i, :label => username)
+    n[:id] = a[:id]
+    n[:name] = a[:name]
+    n[:followers] = a[:fcount].to_i
+    n[:tweets] = a[:tcount].to_i
+  end
 
-  ec = 0
   for i in (0 .. twers.length-1)
     for j in (0 .. twers.length-1)
       if connections[i, j] > 4 then
-        puts "  edge\n  [\n    source #{i}\n    target #{j}\n    weight #{connections[i, j]}\n  ]"
-        ec += 1
+        e = graph.create_edge(graph.nodes[i.to_s], graph.nodes[j.to_s], :weight => connections[i, j])
       end
     end
   end
-  $stderr.puts "#{ec} edges"
-
-  puts "]"
+  
+  $stderr.puts "#{graph.edges.count} edges"
+  puts graph.to_xml
 end
 
 

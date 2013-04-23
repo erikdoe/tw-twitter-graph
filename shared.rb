@@ -7,13 +7,24 @@ def read_names()
 end
 
 def create_map(names)
-  names.inject({}) do |result, name| 
-    result[name] = { :id => result.length, :fcount => 0 }
-    result
+  results = {}
+  names.each_with_index do |name, idx| 
+    response = JSON.parse(File.read(user_filename(name)))[0]
+    results[name] = { 
+      :idx => idx,
+      :id => response["id"],
+      :name => response["name"],
+      :fcount => response["followers_count"], 
+      :tcount => response["statuses_count"] }
   end
+  results
 end
 
-def response_filename(username, cursor = "-1")
+def user_filename(username)
+  "data/user-#{username}.json"
+end
+
+def follower_filename(username, cursor = "-1")
   suffix = (cursor == "-1") ? "" : "-#{cursor}"
   "data/followers-#{username}#{suffix}.json"
 end
@@ -21,21 +32,20 @@ end
 def add_follower_file(username, filename, twers, followers)
   return unless File.exists?(filename)
   response = JSON.parse(File.read(filename))
-  twers[username][:fcount] += response["ids"].length
   response["ids"].each do |followerid|
     followers[followerid] ||= []
-    followers[followerid].push(twers[username][:id])
+    followers[followerid].push(twers[username][:idx])
   end
   next_cursor = response["next_cursor_str"]
   if next_cursor != "0" then
-    add_follower_file(username, response_filename(username, next_cursor), twers, followers)
+    add_follower_file(username, follower_filename(username, next_cursor), twers, followers)
   end
 end
 
 def read_followers(twers)
   followers = {}
   twers.each_key do |username|
-    add_follower_file(username, response_filename(username), twers, followers)
+    add_follower_file(username, follower_filename(username), twers, followers)
   end
   followers
 end

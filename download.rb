@@ -19,8 +19,36 @@ def create_token()
 end
 
 
+def download_user(access_token, username)
+  filename = user_filename(username)
+  return if File.exists?(filename) 
+  response = nil
+  loop do
+    response = access_token.request(:get, "https://api.twitter.com/1.1/users/lookup.json?screen_name=#{username}")
+    puts "#{filename}: #{response.code} (#{response.message})"
+    break if response.code == "200"
+    if response.code == "401" || response.code == "404" then
+      puts "skipping"
+      return
+    elsif response.code == "429" then
+      print "sleeping for 5 minutes due to rate limit"
+      for i in (1..5) do
+        sleep 60
+        print "."
+      end
+      puts
+    else 
+      puts response.body
+      exit(response.code.to_i)
+    end
+  end
+
+  File.open(filename, "w") { |file| file.write(response.body) }
+end
+
+
 def download_followers(access_token, username, cursor = "-1")
-  filename = response_filename(username, cursor)
+  filename = follower_filename(username, cursor)
   return if File.exists?(filename) # TODO: handle the case where only the first file(s) of a set exist
   response = nil
   loop do
@@ -53,5 +81,6 @@ end
 
 access_token = create_token()
 read_names().each do |username|
+  download_user(access_token, username)
   download_followers(access_token, username) 
 end
