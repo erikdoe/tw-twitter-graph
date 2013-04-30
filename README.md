@@ -7,9 +7,9 @@ I'm using [Gephi][] to render the graphs.
 
 The scripts require two files to work:
 
-### twitternames.txt
+### input.csv
 
-Screen names of the Twitter accounts, one per line
+Users to include, comma separated, Twitter name in third column.
 
 ### downloads-auth.yml
 
